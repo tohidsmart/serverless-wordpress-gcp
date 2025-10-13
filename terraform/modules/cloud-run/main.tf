@@ -55,7 +55,7 @@ resource "google_cloud_run_v2_service" "service" {
   template {
     service_account = google_service_account.cloud_run.email
     vpc_access {
-      egress = "PRIVATE_RANGES_ONLY"
+      egress = var.vpc_egress_mode
       network_interfaces {
         network    = var.vpc_network_name
         subnetwork = var.vpc_subnetwork_name

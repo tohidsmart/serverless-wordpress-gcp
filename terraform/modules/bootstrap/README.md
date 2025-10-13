@@ -54,8 +54,6 @@ module "bootstrap" {
   region      = "europe-west1"
   name_prefix = "cms"
 
-  # Enable required APIs
-  enable_apis = true
   required_apis = [
     "run.googleapis.com",
     "sqladmin.googleapis.com",
@@ -81,29 +79,6 @@ module "bootstrap" {
 }
 ```
 
-### Usage with APIs Already Enabled
-
-If your project already has APIs enabled (or they're managed elsewhere):
-
-```hcl
-module "bootstrap" {
-  source = "./modules/bootstrap"
-
-  project_id  = "my-project-id"
-  region      = "europe-west1"
-  name_prefix = "cms"
-
-  # Skip API management
-  enable_apis = false
-
-  labels = {
-    environment = "production"
-    managed_by  = "terraform"
-  }
-}
-```
-
-
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -113,10 +88,8 @@ module "bootstrap" {
 | name_prefix | Prefix for resource names | `string` | `"cms"` | no |
 | artifact_registry_name | Artifact Registry repository name | `string` | `"docker-images"` | no |
 | labels | Labels to apply to resources | `map(string)` | `{"managed_by": "terraform", "purpose": "cms-platform"}` | no |
-| enable_apis | Whether to enable GCP APIs | `bool` | `true` | no |
 | required_apis | List of GCP APIs to enable | `set(string)` | `[]` | yes* |
 
-\*Required when `enable_apis = true` (validated - must provide at least one API)
 
 ## Outputs
 
@@ -147,7 +120,6 @@ module "bootstrap" {
 
 ### API Management (Optional)
 - Enables specified APIs via `required_apis` variable
-- Only created if `enable_apis = true`
 - APIs are **not** disabled on resource destruction (`disable_on_destroy = false`)
 
 ## Post-Bootstrap Steps

@@ -26,7 +26,7 @@
 
 terraform {
   backend "gcs" {
-    bucket = ""
+    bucket = "quixotic-prism-473023-n8-terraform-state"
     prefix = "wp"
   }
 }
@@ -68,10 +68,8 @@ module "bootstrap" {
   name_prefix            = var.name_prefix
   artifact_registry_name = var.artifact_registry_name
 
-  enable_apis   = var.enable_apis
   required_apis = var.required_apis
-
-  labels = var.labels
+  labels        = var.labels
 }
 
 # Networking: VPC, subnets, Cloud NAT
@@ -106,8 +104,8 @@ module "wordpress_db_password" {
   password_length          = 10
   password_special_chars   = true
 
-  # For GDPR: replicate only in EU regions
-  replication_locations = ["europe-west1", "europe-west3"]
+  # Multi-region replication for high availability
+  replication_locations = ["us-central1", "us-east1"]
 
   labels = merge(var.labels, {
     purpose = "database-credentials"
@@ -125,8 +123,8 @@ module "wordpress_admin_password" {
   password_length          = 10
   password_special_chars   = true
 
-  # For GDPR: replicate only in EU regions
-  replication_locations = ["europe-west1", "europe-west3"]
+  # Multi-region replication for high availability
+  replication_locations = ["us-central1", "us-east1"]
 
   labels = merge(var.labels, {
     purpose = "admin-credentials"
@@ -135,7 +133,7 @@ module "wordpress_admin_password" {
   depends_on = [module.bootstrap]
 }
 
-module "mysql-db" {
+module "mysql_db" {
   source  = "terraform-google-modules/sql-db/google//modules/safer_mysql"
   version = "~> 26.0"
 
@@ -146,10 +144,11 @@ module "mysql-db" {
 
   deletion_protection = false
 
-  database_version = "MYSQL_8_0"
-  region           = var.region
-  zone             = var.zones[0]
-  tier             = local.config.db_tier
+  database_version  = "MYSQL_8_0"
+  region            = var.region
+  zone              = var.zones[0]
+  tier              = local.config.db_tier
+  availability_type = null
 
   database_flags = [
     {
@@ -199,8 +198,8 @@ module "wordpress_sa_key_secret" {
   secret_data              = base64decode(google_service_account_key.wordpress_sa_key.private_key)
   generate_random_password = false
 
-  # For GDPR: replicate only in EU regions
-  replication_locations = ["europe-west1", "europe-west3"]
+  # Multi-region replication for high availability
+  replication_locations = ["us-central1", "us-east1"]
 
   labels = merge(var.labels, {
     purpose = "service-account-key"
@@ -276,7 +275,7 @@ module "wordpress_cloudrun" {
   containers = [
     {
       name                 = "wordpress"
-      image                = "${module.bootstrap.docker_image_prefix}/custom-wp:${var.service_image_tag}"
+      image                = var.service_image_tag == null ? "wordpress:latest" : "${module.bootstrap.docker_image_prefix}/custom-wp:${var.service_image_tag}"
       cpu_limit            = local.config.cpu_limit
       memory_limit         = local.config.memory_limit
       container_port       = 80
@@ -334,7 +333,7 @@ module "wordpress_cloudrun" {
     {
       name                 = "cloud-sql-proxy"
       image                = "gcr.io/cloud-sql-connectors/cloud-sql-proxy:latest"
-      command              = ["/cloud-sql-proxy", "--private-ip", module.mysql-db.instance_connection_name]
+      command              = ["/cloud-sql-proxy", "--private-ip", module.mysql_db.instance_connection_name]
       cpu_limit            = "500m"
       memory_limit         = "256Mi"
       cpu_always_allocated = false
@@ -351,7 +350,7 @@ module "wordpress_cloudrun" {
     service = "wordpress"
   })
 
-  depends_on = [module.mysql-db, module.network]
+  depends_on = [module.mysql_db, module.network]
 }
 
 # IAM Binding: Allow Cloud Run to pull images from Artifact Registry (resource-level)

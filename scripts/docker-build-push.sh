@@ -1,22 +1,14 @@
 #!/bin/bash
 set -e
 
-PROJECT_ID=${1:-}
-IMAGE_TAG=${2:-latest}
-REGION=${3:-europe-west1}
-
-if [ -z "$PROJECT_ID" ]; then
-    echo "Usage: $0 <project-id> [image-tag] [region]"
-    echo "Example: $0 my-project v1.0.0 europe-west1"
-    exit 1
-fi
+DOCKER_IMAGE_REPO_PREFIX=${1:? Error: Artifact registry repository uri is required}
+REGION=${2:? Error: Region is required}
+IMAGE_TAG=${3:-latest}
 
 IMAGE_NAME="custom-wp"
-REPO_NAME="docker-images"
-IMAGE_PATH="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+IMAGE_PATH="${DOCKER_IMAGE_REPO_PREFIX}/${IMAGE_NAME}:${IMAGE_TAG}"
 
 echo "=== Building and pushing Docker image ==="
-echo "Project: $PROJECT_ID"
 echo "Image: $IMAGE_PATH"
 
 # Configure Docker auth for Artifact Registry

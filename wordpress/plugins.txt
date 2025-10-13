@@ -1,8 +1,1 @@
 wp-stateless
-wordpress-importer
-themegrill-demo-importer
-# GDPR Compliance Plugins
-gdpr-cookie-compliance
-wp-gdpr-compliance
-cookie-notice
-wordpress-gdpr-compliance

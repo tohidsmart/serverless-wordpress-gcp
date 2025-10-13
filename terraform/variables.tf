@@ -25,15 +25,15 @@ variable "project_id" {
 }
 
 variable "region" {
-  description = "Default GCP region for resources (use EU region for GDPR compliance)"
+  description = "Default GCP region for resources"
   type        = string
-  default     = "europe-west1"
+  default     = "us-central1"
 }
 
 variable "zones" {
-  description = "Default GCP zone for resources (use EU region for GDPR compliance)"
+  description = "Default GCP zone for resources"
   type        = list(string)
-  default     = ["europe-west1-b"]
+  default     = ["us-central1-a"]
 }
 
 variable "name_prefix" {
@@ -59,11 +59,6 @@ variable "artifact_registry_name" {
   default     = "docker-images"
 }
 
-variable "enable_apis" {
-  description = "Whether to enable GCP APIs (set to false if APIs are already enabled)"
-  type        = bool
-  default     = true
-}
 
 variable "required_apis" {
   description = "List of required GCP APIs to enable"
@@ -156,7 +151,7 @@ variable "deployment_profile" {
 
 
 variable "service_image_tag" {
-  description = "The container image tag"
+  description = "The Worpress service container image tag"
   type        = string
-  default     = "0.0.1"
+  default     = null
 }

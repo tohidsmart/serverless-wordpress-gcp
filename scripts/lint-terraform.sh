@@ -12,6 +12,10 @@ NC='\033[0m' # No Color
 
 echo -e "${YELLOW}Starting TFLint...${NC}\n"
 
+# Save the root directory
+ROOT_DIR="$(pwd)"
+CONFIG_FILE="${ROOT_DIR}/.tflint.hcl"
+
 # Check if tflint is installed
 if ! command -v tflint &> /dev/null; then
     echo -e "${RED}tflint is not installed!${NC}"
@@ -37,7 +41,7 @@ for dir in $TERRAFORM_DIRS; do
     echo -e "${YELLOW}Linting: ${dir}${NC}"
     TOTAL=$((TOTAL + 1))
 
-    if (cd "$dir" && tflint --config="$PWD/.tflint.hcl"); then
+    if (cd "$dir" && tflint --config="${CONFIG_FILE}"); then
         echo -e "${GREEN}✓ Passed${NC}\n"
         PASSED=$((PASSED + 1))
     else

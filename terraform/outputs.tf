@@ -91,7 +91,7 @@ output "wordpress_service_account" {
 # Database Outputs
 output "database_connection_name" {
   description = "Cloud SQL instance connection name"
-  value       = module.mysql-db.instance_connection_name
+  value       = module.mysql_db.instance_connection_name
 }
 
 output "database_name" {

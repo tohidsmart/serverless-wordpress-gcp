@@ -15,7 +15,6 @@ labels = {
 
 # Bootstrap Configuration
 artifact_registry_name = "docker-images"
-enable_apis            = true
 
 
 # Network Configuration
@@ -26,5 +25,4 @@ enable_cdn_for_media     = true
 
 # WordPress Configuration
 
-service_image_tag  = "0.0.25"
 deployment_profile = "tiny"

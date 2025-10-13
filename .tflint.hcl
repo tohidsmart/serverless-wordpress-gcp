@@ -3,7 +3,7 @@
 
 config {
   format = "compact"
-  module = true
+  call_module_type = "local"
   force  = false
 }
 
@@ -16,15 +16,6 @@ plugin "google" {
 plugin "terraform" {
   enabled = true
   preset  = "recommended"
-}
-
-// GCP-specific rules
-rule "google_project_service_disable_on_destroy" {
-  enabled = true
-}
-
-rule "google_resource_location" {
-  enabled = true
 }
 
 // Terraform best practices

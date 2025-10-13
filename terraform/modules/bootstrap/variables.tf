@@ -46,19 +46,9 @@ variable "labels" {
   }
 }
 
-variable "enable_apis" {
-  description = "Whether to enable GCP APIs (set to false if APIs are already enabled)"
-  type        = bool
-  default     = true
-}
-
 variable "required_apis" {
   description = "List of required GCP APIs to enable"
   type        = set(string)
   default     = []
 
-  validation {
-    condition     = var.enable_apis == false || length(var.required_apis) > 0
-    error_message = "required_apis must contain at least one API when enable_apis is true"
-  }
 }
