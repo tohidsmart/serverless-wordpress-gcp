@@ -30,7 +30,7 @@ jobs:
           terraform_version: 1.5.0
 
       - name: Run validation script
-        run: ./scripts/validate-terraform.sh
+        run: chmod +x ./scripts/validate-terraform.sh && ./scripts/validate-terraform.sh
 
   lint:
     name: TFLint
@@ -52,4 +52,4 @@ jobs:
           tflint_version: latest
 
       - name: Run lint script
-        run: ./scripts/lint-terraform.sh
+        run: chmod +x ./scripts/lint-terraform.sh && ./scripts/lint-terraform.sh
