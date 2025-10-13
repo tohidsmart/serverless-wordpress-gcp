@@ -9,12 +9,10 @@ Complete guide to deploying production-ready WordPress on Google Cloud Platform 
 1. [Prerequisites](#prerequisites)
 2. [Initial Setup](#initial-setup)
 3. [Deployment Methods](#deployment-methods)
-   - [Quick Deploy (Recommended)](#quick-deploy-recommended)
-   - [Manual Step-by-Step Deploy](#manual-step-by-step-deploy)
 4. [Post-Deployment](#post-deployment)
-5. [Configuration](#configuration)
-6. [Troubleshooting](#troubleshooting)
-7. [Teardown](#teardown)
+5. [Troubleshooting](#troubleshooting)
+6. [Teardown](#teardown)
+7. [Resources](#resources)
 
 ---
 
@@ -36,11 +34,9 @@ Complete guide to deploying production-ready WordPress on Google Cloud Platform 
 - New users get $300 free credits for 90 days
 - **Important:** Must upgrade from free trial to paid account (required for Cloud SQL)
 
-**2. Create or Select a Project**
+**2. Select your Project**
 
 ```bash
-# Create new project
-gcloud projects create YOUR-PROJECT-ID --name="WordPress Hosting"
 
 # Or list existing projects
 gcloud projects list
@@ -209,117 +205,6 @@ WordPress URL: https://cms-wordpress-123456789.us-central1.run.app
 
 ---
 
-### Manual Step-by-Step Deploy
-
-If you prefer granular control or need to troubleshoot:
-
-#### Step 1: Enable APIs
-
-```bash
-gcloud config set project YOUR-PROJECT-ID
-
-gcloud services enable cloudresourcemanager.googleapis.com
-gcloud services enable serviceusage.googleapis.com
-gcloud services enable iam.googleapis.com
-gcloud services enable storage.googleapis.com
-```
-
-#### Step 2: Create Terraform State Bucket
-
-```bash
-./scripts/bootstrap-state-bucket.sh YOUR-PROJECT-ID us-central1
-```
-
-**What this creates:**
-- Bucket: `YOUR-PROJECT-ID-terraform-state`
-- Location: Same region as deployment
-- Versioning: Enabled
-- Lifecycle: Keep 5 versions, delete after 90 days
-
-#### Step 3: Configure Terraform Backend
-
-```bash
-# Update main.tf with your bucket name
-sed -i.bak 's/bucket = ""/bucket = "YOUR-PROJECT-ID-terraform-state"/' terraform/main.tf
-
-# Or manually edit terraform/main.tf:
-# backend "gcs" {
-#   bucket = "YOUR-PROJECT-ID-terraform-state"
-#   prefix = "wp"
-# }
-```
-
-#### Step 4: Initialize Terraform
-
-```bash
-cd terraform
-
-terraform init
-```
-
-**Expected output:**
-```
-Initializing the backend...
-Successfully configured the backend "gcs"!
-
-Initializing provider plugins...
-- terraform.io/google ~> 5.0
-
-Terraform has been successfully initialized!
-```
-
-#### Step 5: Plan Deployment
-
-```bash
-terraform plan -var="project_id=YOUR-PROJECT-ID"
-```
-
-**Review the plan:**
-- ~40-50 resources to be created
-- No resources destroyed (first deployment)
-- Check for any errors
-
-#### Step 6: Deploy Infrastructure
-
-```bash
-terraform apply -var="project_id=YOUR-PROJECT-ID"
-```
-
-Type `yes` when prompted.
-
-**Wait time:** ~6-8 minutes (Cloud SQL creation is the bottleneck)
-
-#### Step 7: Build and Push WordPress Image
-
-```bash
-# Get the Artifact Registry URL from Terraform output
-DOCKER_REPO=$(terraform output -raw docker_image_prefix)
-
-# Build and push (run from repository root)
-cd ..
-./scripts/docker-build-push.sh $DOCKER_REPO us-central1 latest
-```
-
-#### Step 8: Update Cloud Run with Custom Image
-
-```bash
-cd terraform
-
-terraform apply \
-  -var="project_id=YOUR-PROJECT-ID" \
-  -var="service_image_tag=latest"
-```
-
-Type `yes` when prompted.
-
-#### Step 9: Get WordPress URL
-
-```bash
-terraform output wordpress_url
-```
-
----
-
 ## Post-Deployment
 
 ### Access WordPress Admin
@@ -432,84 +317,6 @@ gcloud run services logs tail cms-wordpress \
 ```bash
 gcloud sql operations list --instance=wp-instance-*
 ```
-
----
-
-## Configuration
-
-### Custom Domain
-
-**1. Verify domain ownership in GCP:**
-
-```bash
-gcloud domains verify yourdomain.com
-```
-
-**2. Map domain to Cloud Run:**
-
-```bash
-gcloud run domain-mappings create \
-  --service=cms-wordpress \
-  --domain=yourdomain.com \
-  --region=us-central1
-```
-
-**3. Update DNS:**
-
-Add the CNAME record shown in the output to your DNS provider.
-
-**4. Update WordPress URL:**
-
-```bash
-cd terraform
-
-terraform apply \
-  -var="project_id=YOUR-PROJECT-ID" \
-  -var="wordpress_url=https://yourdomain.com"
-```
-
-### Scaling Configuration
-
-Edit `terraform/main.tf` to adjust scaling:
-
-```hcl
-locals {
-  profile_config = {
-    tiny = {
-      db_tier       = "db-f1-micro"
-      cpu_limit     = "1000m"
-      memory_limit  = "512Mi"
-      min_instances = 0        # Scale to zero
-      max_instances = 10       # Increase max instances
-    }
-  }
-}
-```
-
-Apply changes:
-
-```bash
-terraform apply -var="project_id=YOUR-PROJECT-ID"
-```
-
-### Enable CDN for Media
-
-**1. Update terraform/main.tf:**
-
-```hcl
-module "media_storage" {
-  # ...
-  enable_cdn = true  # Change from false to true
-}
-```
-
-**2. Apply changes:**
-
-```bash
-terraform apply -var="project_id=YOUR-PROJECT-ID"
-```
-
-**3. Update WP-Stateless to use CDN URL**
 
 ---
 
@@ -641,10 +448,6 @@ terraform validate
 terraform fmt -check
 ```
 
-**Run cost estimation:**
-```bash
-./scripts/estimate-costs.sh YOUR-PROJECT-ID
-```
 
 ---
 
@@ -690,37 +493,6 @@ gcloud projects delete YOUR-PROJECT-ID
 
 ---
 
-## Next Steps
-
-### Production Readiness
-
-- [ ] Set up custom domain with SSL
-- [ ] Configure Cloud Armor for DDoS protection
-- [ ] Enable Cloud SQL automatic backups
-- [ ] Set up monitoring and alerting
-- [ ] Configure WordPress caching plugin
-- [ ] Review and harden IAM permissions
-- [ ] Enable Cloud SQL high availability (if critical)
-- [ ] Set up CI/CD for WordPress updates
-
-### Cost Optimization
-
-- [ ] Review actual usage with `estimate-costs.sh`
-- [ ] Adjust min/max instances based on traffic
-- [ ] Enable Cloud Storage lifecycle policies
-- [ ] Consider committed use discounts for sustained workloads
-- [ ] Set up billing alerts
-
-### Further Customization
-
-- [ ] Add more deployment profiles (small, medium, enterprise)
-- [ ] Configure Cloud CDN for static assets
-- [ ] Add Cloud Armor WAF rules
-- [ ] Set up multi-region deployment
-- [ ] Implement backup/restore automation
-- [ ] Add WordPress plugin pre-installation
-
----
 
 ## Resources
 

@@ -10,19 +10,41 @@ Deploy a scalable, secure WordPress site on Google Cloud Platform in minutes. No
 
 | Feature | **This Solution** | WP Engine | Kinsta |
 |---------|-------------------|-----------|--------|
-| **Monthly Cost** | **$21** | $25-30 | $35 |
-| **Traffic Included** | 100K requests | 25K visits | 25K visits |
+| **Monthly Cost** | **$21** | $50 | $50 |
+| **Free hosting period** | **3 months^** | ❌ | ❌ |
+| **Traffic Included** | 100K requests | 75K visits | 65K visits |
 | **Auto-scaling** | ✅ Unlimited | ❌ Fixed resources | ❌ Fixed resources |
 | **Infrastructure Control** | ✅ Full access | ❌ Black box | ❌ Black box |
 | **Infrastructure as Code** | ✅ Terraform | ❌ | ❌ |
 | **Vendor Lock-in** | ✅ None - you own it | ❌ Locked | ❌ Locked |
 | **Custom Architecture** | ✅ Fully customizable | ❌ Limited | ❌ Limited |
 | **Database Backups** | ✅ Auto + PITR | ✅ | ✅ |
+| **Backups Retention** | 7 days | ? | 14 days |
 | **CDN for Media** | ✅ Google Cloud Storage | ✅ | ✅ |
 | **One-Click Deploy** | ✅ | ✅ | ✅ |
 | **Multi-region** | ✅ 40+ regions | ❌ Limited | ❌ Limited |
+| **Multi-sites** |  ❌ | ✅  3 sites  | ❌ |
+| **24/7 WordPress technical expertise** |  ❌ |  ✅   | ✅ |
 
-**The Bottom Line:** Save 40% on costs while getting unlimited scalability and full control over your infrastructure.
+
+**The Bottom Line:** Save at least 40% on costs while getting unlimited scalability and full control over your infrastructure.
+
+---
+
+## 🎁 ^ Free for 3 Months!
+
+**New Google Cloud users get $300 in free credits valid for 90 days.**
+
+This means your WordPress hosting is **completely free** for the first 3 months, even if you spend $100/month on resources!
+
+- ✅ **$21/month** × 3 months = **$63 total**
+- ✅ You have **$300 in credits**
+- ✅ **$237 left over** to experiment with other GCP services
+
+**Even better:** If your site scales up to $50-100/month during testing, you're still covered by the free credits.
+
+👉 [Sign up for Google Cloud](https://cloud.google.com/) and get started today with zero upfront costs!
+
 
 ---
 
@@ -52,7 +74,7 @@ Deploy a scalable, secure WordPress site on Google Cloud Platform in minutes. No
 ## Cost Breakdown
 
 ### Tiny Profile (Current Deployment)
-*Based on actual Google Cloud pricing as of October 2025*
+*Based on actual Google Cloud pricing as of October 2025 in _us-central1_ region*
 
 | Service | Details | Monthly Cost |
 |---------|---------|--------------|
@@ -77,7 +99,7 @@ Deploy a scalable, secure WordPress site on Google Cloud Platform in minutes. No
 - No charge when site has zero traffic
 - Additional requests: $0.40 per million
 
----
+
 
 ## Quick Start
 
@@ -138,7 +160,7 @@ Cloud Run (WordPress)
 
 ## What's Included
 
-### Free Version (Main Branch)
+### Free Version (This repo)
 - ✅ Complete infrastructure deployment
 - ✅ One-click deployment script
 - ✅ Terraform modules with full documentation
@@ -146,13 +168,13 @@ Cloud Run (WordPress)
 - ✅ Cost estimation scripts
 - ✅ Basic deployment guide
 
-### Premium Version (Coming Soon)
+### Premium Version
 - 🔒 Multiple deployment profiles (small, medium, enterprise)
-- 🔒 FinOps add-ons (budgets, spending alerts, forecasting)
-- 🔒 Enhanced compliance (audit logs, GDPR tools)
+- 🔒 FinOps add-ons (budgets, spending alerts, forecasting, custom billing dashboard)
+- 🔒 Enhanced compliance (audit logs, GDPR tools if required)
 - 🔒 Comprehensive documentation (architecture diagrams, video tutorials)
 - 🔒 Production readiness checklist
-- 🔒 Load testing and performance optimization guides
+- 🔒 Load testing and performance optimization
 
 ---
 
@@ -171,7 +193,7 @@ Cloud Run (WordPress)
 - 🚀 **Startups & SMBs** - Cost-effective hosting that scales with growth
 - 💼 **Agencies** - Deploy client sites with full infrastructure control
 - 🧑‍💻 **Developers** - Learn cloud-native architecture and IaC
-- 🏢 **Enterprises** - GDPR-compliant, auditable infrastructure
+- 🏢 **Enterprises** - Auditable infrastructure with multi-region deployment
 
 **Not ideal for:**
 - Sites requiring 24/7 sub-100ms response times (cold starts ~1-2s)
@@ -201,6 +223,19 @@ A: Those are also good options, but this solution gives you full infrastructure 
 
 **Q: What about WordPress updates?**
 A: You control the WordPress version in your Docker image. Rebuild and redeploy to update. Consider using official WordPress base images tagged with specific versions.
+
+**Q: What about installing WordPress themes and plugins?**
+A: For production, we recommend pre-installing themes/plugins in your Docker image and rebuilding/redeploying when you need updates.
+
+**Q: How is this different from other open-source repositories on GitHub doing the same thing?**
+A: Most WordPress-on-GCP repos have significant limitations:
+ - **No end-to-end Terraform IaC setup** - They use manual GCP Console steps or incomplete Terraform configs
+ - **No one-click deployment script** - You have to run multiple commands manually and troubleshoot each step
+ - **Outdated architecture** - Based on Compute Engine VMs or GKE, which don't scale to zero and cost more
+ - **No documentation** - Minimal READMEs with no deployment guides or troubleshooting help
+ - **Not production-ready** - Missing crucial features like private networking, secret management, or proper IAM setup
+
+This repo provides a complete, modern, serverless solution with comprehensive documentation and automation.
 
 **Q: Can I use my own domain?**
 A: Yes! Cloud Run provides a default `*.run.app` domain, but you can [map custom domains](https://cloud.google.com/run/docs/mapping-custom-domains) with automatic SSL certificates.
