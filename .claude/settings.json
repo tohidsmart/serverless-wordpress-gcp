@@ -1,0 +1,41 @@
+{
+  "projectInfo": {
+    "name": "Serverless Wordpress GCP",
+    "description": "Serverless Wordpress GCP repository"
+  },
+  "customInstructions": "",
+  "alwaysAllowWrite": [
+    "**/*.ts",
+    "**/*.js",
+    "**/*.py",
+    "**/*.java",
+    "**/*.go",
+    "**/*.rs",
+    "**/*.cpp",
+    "**/*.c",
+    "**/*.h",
+    "**/*.css",
+    "**/*.html",
+    "**/*.json",
+    "**/*.yaml",
+    "**/*.yml",
+    "**/*.toml",
+    "**/*.tf",
+    "**/*.tfvars"
+  ],
+  "alwaysAllowRead": [
+    "**/*"
+  ],
+  "pathExclusions": [
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.next/**",
+    "**/target/**",
+    "**/__pycache__/**",
+    "**/*.pyc",
+    "**/venv/**",
+    "**/.venv/**"
+  ]
+}

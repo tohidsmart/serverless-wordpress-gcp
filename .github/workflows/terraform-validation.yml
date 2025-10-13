@@ -1,0 +1,55 @@
+name: Terraform Validation
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'terraform/**'
+      - '.tflint.hcl'
+      - 'scripts/**'
+      - '.github/workflows/terraform-validation.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'terraform/**'
+      - '.tflint.hcl'
+      - 'scripts/**'
+
+jobs:
+  validate:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Run validation script
+        run: ./scripts/validate-terraform.sh
+
+  lint:
+    name: TFLint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache TFLint plugins
+        uses: actions/cache@v3
+        with:
+          path: ~/.tflint.d/plugins
+          key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: Run lint script
+        run: ./scripts/lint-terraform.sh

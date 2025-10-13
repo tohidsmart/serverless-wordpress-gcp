@@ -1,0 +1,3 @@
+# Ignore local Claude Code settings that should not be committed
+*.local.json
+chat_history/
