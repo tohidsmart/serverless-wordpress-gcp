@@ -10,7 +10,7 @@ Deploy a scalable, secure WordPress site on Google Cloud Platform in minutes. No
 
 | Feature | **This Solution** | WP Engine | Kinsta |
 |---------|-------------------|-----------|--------|
-| **Monthly Cost** | **$21** | $50 | $50 |
+| **Monthly Cost** as of Oct 2025 | **$21** | $50 | $50 |
 | **Free hosting period** | **3 months^** | ❌ | ❌ |
 | **Traffic Included** | 100K requests | 75K visits | 65K visits |
 | **Auto-scaling** | ✅ Unlimited | ❌ Fixed resources | ❌ Fixed resources |
@@ -31,7 +31,7 @@ Deploy a scalable, secure WordPress site on Google Cloud Platform in minutes. No
 
 ---
 
-## 🎁 ^ Free for 3 Months!
+## 🎁 ^Free for 3 Months!
 
 **New Google Cloud users get $300 in free credits valid for 90 days.**
 
@@ -113,7 +113,7 @@ This means your WordPress hosting is **completely free** for the first 3 months,
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/serverless-wordpress-gcp.git
+git clone https://github.com/tohidsmart/serverless-wordpress-gcp.git
 cd serverless-wordpress-gcp
 
 # 2. Configure gcloud authentication
@@ -130,7 +130,7 @@ gcloud auth application-default login
 - ✅ Build and push custom WordPress image
 - ✅ Output your WordPress URL
 
-Deployment takes ~8-12 minutes.
+Deployment takes ~8-12 minutes. For detailed information, please refer to [Deployment Guide](DEPLOYMENT.md)
 
 ---
 
