@@ -250,9 +250,9 @@ A: Cloud SQL automatically creates daily backups with 7-day retention. You can a
 
 ## Support & Community
 
-- 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/serverless-wordpress-gcp/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/serverless-wordpress-gcp/discussions)
-- 📚 **Wiki**: [Project Wiki](https://github.com/yourusername/serverless-wordpress-gcp/wiki)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/tohidsmart/serverless-wordpress-gcp/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/tohidsmart/serverless-wordpress-gcp/discussions)
+- 📚 **Wiki**: [Project Wiki](https://github.com/tohidsmart/serverless-wordpress-gcp/wiki)
 
 ---
 
@@ -269,6 +269,7 @@ Built with:
 - [Google Cloud Platform](https://cloud.google.com/)
 - [WordPress](https://wordpress.org/)
 - [Cloud SQL Proxy](https://github.com/GoogleCloudPlatform/cloud-sql-proxy)
+- [GCP WP Stateless Plugin](https://wordpress.org/plugins/wp-stateless/)
 
 ---
 
