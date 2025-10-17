@@ -36,7 +36,7 @@ module "vpc" {
       subnet_ip             = var.subnet_cidr
       subnet_region         = var.region
       subnet_private_access = true
-      description           = "Main subnet for Cloud SQL private IP"
+      description           = "Main subnet for Cloud SQL private IP and Cloud Run Direct VPC egress"
     }
   ]
 
@@ -87,6 +87,7 @@ resource "google_compute_global_address" "private_ip_address" {
   address_type  = "INTERNAL"
   prefix_length = var.private_ip_prefix_length
   network       = module.vpc.network_id
+  depends_on    = [module.vpc]
 }
 
 # Private Service Connection for Cloud SQL private IP
@@ -96,4 +97,56 @@ resource "google_service_networking_connection" "private_vpc_connection" {
   network                 = module.vpc.network_id
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.private_ip_address[0].name]
+}
+
+# Lifecycle guard: Check for orphaned serverless IPs before subnet destruction
+# Cloud Run Direct VPC egress creates serverless IP reservations that must be
+# released before the subnet can be destroyed
+resource "null_resource" "check_serverless_ips" {
+  triggers = {
+    network_id = module.vpc.network_id
+    region     = var.region
+    project_id = var.project_id
+  }
+
+  # Check for serverless IPs before allowing destroy
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<-EOT
+      echo "Checking for serverless IP reservations in ${self.triggers.region}..."
+      ORPHANED_IPS=$(gcloud compute addresses list \
+        --filter="purpose=SERVERLESS AND region:${self.triggers.region}" \
+        --format="value(name)" \
+        --project="${self.triggers.project_id}" \
+        --regions="${self.triggers.region}" 2>/dev/null || echo "")
+
+      if [ -n "$ORPHANED_IPS" ]; then
+        echo "WARNING: Found orphaned serverless IP reservations:"
+        echo "$ORPHANED_IPS"
+        echo ""
+        echo "Waiting 30 seconds for IPs to be released..."
+        sleep 30
+
+        # Check again
+        REMAINING_IPS=$(gcloud compute addresses list \
+          --filter="purpose=SERVERLESS AND region:${self.triggers.region}" \
+          --format="value(name)" \
+          --project="${self.triggers.project_id}" \
+          --regions="${self.triggers.region}" 2>/dev/null || echo "")
+
+        if [ -n "$REMAINING_IPS" ]; then
+          echo "ERROR: Serverless IP reservations still exist. Run this before terraform destroy:"
+          echo ""
+          for ip in $REMAINING_IPS; do
+            echo "  gcloud compute addresses delete $ip --region=${self.triggers.region} --project=${self.triggers.project_id} --quiet"
+          done
+          exit 1
+        fi
+      fi
+
+      echo "No orphaned serverless IPs found. Safe to proceed."
+    EOT
+  }
+
+  depends_on = [module.vpc]
 }

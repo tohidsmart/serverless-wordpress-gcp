@@ -2,8 +2,8 @@
 
 # Project Configuration
 project_id  = ""
-region      = "europe-west1"
-zones       = ["europe-west1-b"]
+region      = "us-central1"
+zones       = ["us-central1-a"]
 name_prefix = "cms"
 
 # Labels
@@ -25,4 +25,4 @@ enable_cdn_for_media     = true
 
 # WordPress Configuration
 
-deployment_profile = "tiny"
+deployment_profile = "small"

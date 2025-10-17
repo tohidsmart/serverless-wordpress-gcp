@@ -1,0 +1,10 @@
+# Ignore all test result files
+*.json
+*.log
+*.html
+
+# But keep the COMPARISON_REPORT for reference
+!COMPARISON_REPORT.md
+
+# Ignore timestamp directories
+*/

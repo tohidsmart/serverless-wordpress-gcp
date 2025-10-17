@@ -43,7 +43,8 @@ if ('${ENVIRONMENT:-production}' === 'production') {
 define('WP_HOME', '${WORDPRESS_URL}');
 define('WP_SITEURL', '${WORDPRESS_URL}');
 
-define('GDPR_COOKIE_CONSENT_ENABLE', true);
+// Enable direct filesystem access (required for plugin/theme installation in containers)
+define('FS_METHOD', 'direct');
 
 // WP-Stateless Configuration - Use service account key JSON directly
 define('WP_STATELESS_MEDIA_BUCKET', '${STATELESS_MEDIA_BUCKET}');
@@ -84,6 +85,73 @@ fi
 echo "Activating all plugins..."
 wp plugin activate --all --allow-root --path=/var/www/html || true
 
+# Ensure .htaccess exists with proper permissions
+echo "Ensuring .htaccess file exists..."
+touch /var/www/html/.htaccess
+chown www-data:www-data /var/www/html/.htaccess
+chmod 644 /var/www/html/.htaccess
+
+# Check if wp-config.php exists before flushing rewrites
+if [ ! -f /var/www/html/wp-config.php ]; then
+    echo "ERROR: wp-config.php not found! Cannot flush rewrite rules."
+else
+    # Flush rewrite rules to ensure permalinks work correctly on new containers
+    echo "Flushing rewrite rules..."
+    if ! wp rewrite flush --allow-root --path=/var/www/html 2>&1; then
+        echo "WARNING: wp rewrite flush failed, trying alternative method..."
+        # Manually create .htaccess for WordPress permalinks
+        cat > /var/www/html/.htaccess <<'HTACCESS'
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+HTACCESS
+        chown www-data:www-data /var/www/html/.htaccess
+        echo "Created .htaccess manually"
+    fi
+fi
+
+# Debug: Check permalink structure
+echo "Checking permalink structure:"
+wp rewrite structure --allow-root --path=/var/www/html || echo "No permalink structure set"
+
+# Debug: Check file permissions
+echo "File permissions for .htaccess:"
+ls -la /var/www/html/.htaccess || echo ".htaccess not found"
+
+# Verify .htaccess was created
+echo "Checking .htaccess content:"
+cat /var/www/html/.htaccess || echo "ERROR: .htaccess file is EMPTY!"
+
+# If still empty after flush, write it manually
+if [ ! -s /var/www/html/.htaccess ]; then
+    echo "WARNING: .htaccess is empty after flush, writing manually..."
+    cat > /var/www/html/.htaccess <<'HTACCESS'
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+HTACCESS
+    chown www-data:www-data /var/www/html/.htaccess
+    chmod 644 /var/www/html/.htaccess
+    echo "Created .htaccess manually with default WordPress rules"
+    echo "Final .htaccess content:"
+    cat /var/www/html/.htaccess
+fi
 
 # Execute the main container command
 exec "$@"

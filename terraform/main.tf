@@ -26,7 +26,7 @@
 
 terraform {
   backend "gcs" {
-    bucket = "quixotic-prism-473023-n8-terraform-state"
+    bucket = ""
     prefix = "wp"
   }
 }
@@ -53,7 +53,17 @@ locals {
       log_retention      = 90
       estimated_cost_usd = "12-18"
     }
-    # other deployment profiles can be configured here
+    small = {
+      db_tier            = "db-f1-micro" // "db-g1-small"
+      cpu_limit          = "2000m"       # 2 CPUs
+      memory_limit       = "1Gi"         # 1GB RAM
+      min_instances      = 0
+      max_instances      = 5
+      enable_lb          = false
+      log_retention      = 365
+      estimated_cost_usd = "30-40"
+    }
+
   }
 
   config = local.profile_config[var.deployment_profile]
@@ -143,6 +153,15 @@ module "mysql_db" {
   project_id           = var.project_id
 
   deletion_protection = false
+  backup_configuration = {
+    enabled                        = true
+    transaction_log_retention_days = 7
+    retained_backups               = 7
+    binary_log_enabled             = false
+    location                       = null
+    retention_unit                 = null
+    start_time                     = null
+  }
 
   database_version  = "MYSQL_8_0"
   region            = var.region
@@ -212,10 +231,11 @@ module "wordpress_sa_key_secret" {
 module "media_storage" {
   source = "./modules/storage"
 
-  project_id  = var.project_id
-  bucket_name = "${var.project_id}-media"
-  name_prefix = ""
-  location    = var.region
+  project_id    = var.project_id
+  bucket_name   = "${var.project_id}-media"
+  name_prefix   = ""
+  force_destroy = true
+  location      = var.region
 
   # Allow public access for media files
   public_access_prevention = "inherited"
@@ -350,6 +370,10 @@ module "wordpress_cloudrun" {
     service = "wordpress"
   })
 
+  # IMPORTANT: Cloud Run Direct VPC egress creates serverless IP reservations
+  # that must be destroyed before the network. The depends_on ensures proper
+  # destruction order. The network module has a null_resource guard that will
+  # check for orphaned IPs during destroy.
   depends_on = [module.mysql_db, module.network]
 }
 

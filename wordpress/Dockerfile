@@ -62,16 +62,11 @@ ARG TZ=Europe/Berlin
 # Install jq for JSON validation
 RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/*
 
-# Configure PHP upload limits and temp directory
-RUN { \
-    echo 'upload_max_filesize = 64M'; \
-    echo 'post_max_size = 64M'; \
-    echo 'memory_limit = 256M'; \
-    echo 'max_execution_time = 300'; \
-    echo 'max_input_time = 300'; \
-    echo 'upload_tmp_dir = /tmp'; \
-    echo 'file_uploads = On'; \
-} > /usr/local/etc/php/conf.d/uploads.ini
+# Copy optimized PHP configurations
+# Performance: OPcache for 40-50% faster PHP execution
+# Memory: Optimized settings for Cloud Run (1GB RAM)
+COPY php-opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY php-performance.ini /usr/local/etc/php/conf.d/performance.ini
 
 # Ensure proper permissions for WordPress directories
 RUN chown -R www-data:www-data /var/www/html && \
@@ -87,6 +82,17 @@ COPY --from=builder /var/www/html/ /var/www/html/
 # Copy entrypoint script (wp-config.php will be generated at runtime)
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Enable mod_rewrite and configure Apache to allow .htaccess
+RUN a2enmod rewrite
+
+# Copy Apache configuration with AllowOverride All
+COPY apache-wordpress.conf /etc/apache2/sites-available/000-default.conf
+
+# Copy optimized Apache MPM configuration for Cloud Run
+# Tuned for 1GB RAM: 20 workers @ ~45MB each = optimal memory usage
+COPY apache-mpm.conf /etc/apache2/conf-available/mpm-tuning.conf
+RUN a2enconf mpm-tuning
 
 # Force HTTPS
 ENV WORDPRESS_CONFIG_EXTRA="define('FORCE_SSL_ADMIN', true);"
