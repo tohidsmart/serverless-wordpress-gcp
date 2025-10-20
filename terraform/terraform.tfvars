@@ -21,7 +21,7 @@ artifact_registry_name = "docker-images"
 subnet_cidr = "10.0.0.0/16"
 
 private_ip_prefix_length = 20
-enable_cdn_for_media     = true
+enable_cdn_for_media     = false
 
 # WordPress Configuration
 

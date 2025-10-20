@@ -37,7 +37,6 @@ data "google_project" "current" {
 }
 
 # Map profile to infrastructure resources
-# Tuned for 75K visits/month load testing
 locals {
   # Auto-construct WordPress URL based on Cloud Run naming convention
   wordpress_url = "https://${var.name_prefix}-wordpress-${data.google_project.current.number}.${var.region}.run.app"
@@ -45,7 +44,7 @@ locals {
   profile_config = {
     tiny = {
       db_tier            = "db-f1-micro"
-      cpu_limit          = "1000m" # 1 CPU
+      cpu_limit          = "1000m" # 1 vCPU
       memory_limit       = "512Mi" # 512MB RAM
       min_instances      = 0
       max_instances      = 3
@@ -54,9 +53,9 @@ locals {
       estimated_cost_usd = "12-18"
     }
     small = {
-      db_tier            = "db-f1-micro" // "db-g1-small"
-      cpu_limit          = "2000m"       # 2 CPUs
-      memory_limit       = "1Gi"         # 1GB RAM
+      db_tier            = "db-f1-micro"
+      cpu_limit          = "2000m" # 2 vCPUs
+      memory_limit       = "2Gi"   # 1GB RAM
       min_instances      = 0
       max_instances      = 5
       enable_lb          = false
