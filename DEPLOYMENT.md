@@ -99,7 +99,7 @@ gcloud projects get-iam-policy YOUR-PROJECT-ID \
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/serverless-wordpress-gcp.git
+git clone https://github.com/tohidsmart/serverless-wordpress-gcp.git
 cd serverless-wordpress-gcp
 ```
 
@@ -504,4 +504,4 @@ gcloud projects delete YOUR-PROJECT-ID
 
 ---
 
-**Questions?** [Open an issue](https://github.com/yourusername/serverless-wordpress-gcp/issues)
+**Questions?** [Open an issue](https://github.com/tohidsmart/serverless-wordpress-gcp/issues)
