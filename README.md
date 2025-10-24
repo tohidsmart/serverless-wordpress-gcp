@@ -1,4 +1,5 @@
 # WordPress on GCP Cloud Run
+Read about the intention behind this repo [here](https://www.linkedin.com/pulse/how-i-deployed-wordpress-gcp-cloud-run-30-60-cheaper-than-tohid-azimi-bws8c/)
 
 **Production-ready WordPress hosting for $36/month. Own your infrastructure, not rent it.**
 
