@@ -32,6 +32,24 @@ Deploy a scalable, secure WordPress site on Google Cloud Platform in minutes. No
 
 ---
 
+## 🎬 Deployment Demo
+
+<a href="https://www.youtube.com/watch?v=aevveq0ohw8">
+  <img src="https://img.youtube.com/vi/aevveq0ohw8/maxresdefault.jpg" alt="WordPress on GCP Cloud Run - Deployment Demo" width="600">
+</a>
+
+**[▶️ Watch the full deployment (1:20)](https://www.youtube.com/watch?v=aevveq0ohw8)**
+
+See the complete deployment process from a single command to a live WordPress site. Video shows actual deployment trimmed at 3x speed (~20 minutes real-time).
+
+**What you'll see:**
+- One command: `./scripts/end-to-end-deploy.sh <PROJECT-ID>`
+- Automated infrastructure deployment with Terraform
+- WordPress container build and deployment
+- Live site in under 20 minutes
+
+---
+
 ## 🎁 ^Free for 3 Months!
 
 **New Google Cloud users get $300 in free credits valid for 90 days.**
