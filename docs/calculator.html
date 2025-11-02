@@ -499,7 +499,7 @@
 
             if (savings > 0) {
                 savingsCard.style.borderColor = '#10b981';
-                document.getElementById('savings-header').textContent = `Savings vs WP Engine ${wpEnginePlanName}`;
+                document.getElementById('savings-header').innerHTML = `Savings vs WP Engine <b>${wpEnginePlanName}</b> plan`;
                 document.getElementById('monthly-savings').innerHTML = `$${Math.abs(savings).toFixed(0)}<span style="font-size: 18px; color: #6b7280;">/month</span>`;
                 document.getElementById('savings-percent').textContent = `${savingsPercent}% less`;
                 document.getElementById('savings-percent').style.background = '#dcfce7';
