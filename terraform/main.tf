@@ -43,24 +43,44 @@ locals {
 
   profile_config = {
     tiny = {
-      db_tier            = "db-f1-micro"
-      cpu_limit          = "1000m" # 1 vCPU
-      memory_limit       = "512Mi" # 512MB RAM
-      min_instances      = 0
-      max_instances      = 3
-      enable_lb          = false
-      log_retention      = 90
-      estimated_cost_usd = "12-18"
+      db_tier             = "db-f1-micro"
+      cpu_limit           = "1000m" # 1 vCPU
+      memory_limit        = "512Mi" # 512MB RAM
+      min_instances       = 0
+      max_instances       = 3
+      enable_lb           = false
+      log_retention       = 90
+      request_concurrency = 10
     }
     small = {
-      db_tier            = "db-f1-micro"
-      cpu_limit          = "2000m" # 2 vCPUs
-      memory_limit       = "2Gi"   # 1GB RAM
-      min_instances      = 0
-      max_instances      = 5
-      enable_lb          = false
-      log_retention      = 365
-      estimated_cost_usd = "30-40"
+      db_tier             = "db-f1-micro"
+      cpu_limit           = "2000m"
+      memory_limit        = "2Gi"
+      min_instances       = 0
+      max_instances       = 5
+      enable_lb           = false
+      log_retention       = 365
+      request_concurrency = 10
+    }
+    medium = {
+      db_tier             = "db-g1-small"
+      cpu_limit           = "4000m"
+      memory_limit        = "4Gi"
+      min_instances       = 0
+      max_instances       = 10
+      enable_lb           = false
+      log_retention       = 365
+      request_concurrency = 20
+    }
+    large = {
+      db_tier             = "db-n1-standard-1"
+      cpu_limit           = "4000m"
+      memory_limit        = "8Gi"
+      min_instances       = 1
+      max_instances       = 20
+      enable_lb           = false
+      log_retention       = 365
+      request_concurrency = 20
     }
 
   }
@@ -289,6 +309,7 @@ module "wordpress_cloudrun" {
   vpc_subnetwork_name = module.network.subnets_names[0]
   min_instances       = local.config.min_instances
   max_instances       = local.config.max_instances
+  request_concurrency = local.config.request_concurrency
 
   # Multi-container configuration
   containers = [
@@ -327,27 +348,7 @@ module "wordpress_cloudrun" {
         }
       }
 
-      # startup_probe = {
-      #   initial_delay_seconds = 10
-      #   timeout_seconds       = 3
-      #   period_seconds        = 10
-      #   failure_threshold     = 3
-      #   http_get = {
-      #     path = "/"
-      #     port = 80
-      #   }
-      # }
 
-      # liveness_probe = {
-      #   initial_delay_seconds = 30
-      #   timeout_seconds       = 3
-      #   period_seconds        = 30
-      #   failure_threshold     = 3
-      #   http_get = {
-      #     path = "/"
-      #     port = 80
-      #   }
-      # }
     },
     {
       name                 = "cloud-sql-proxy"

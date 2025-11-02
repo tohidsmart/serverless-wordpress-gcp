@@ -53,7 +53,8 @@ resource "google_cloud_run_v2_service" "service" {
 
 
   template {
-    service_account = google_service_account.cloud_run.email
+    service_account                  = google_service_account.cloud_run.email
+    max_instance_request_concurrency = var.request_concurrency
     vpc_access {
       egress = var.vpc_egress_mode
       network_interfaces {

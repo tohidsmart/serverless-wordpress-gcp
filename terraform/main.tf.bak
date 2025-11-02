@@ -26,7 +26,7 @@
 
 terraform {
   backend "gcs" {
-    bucket = "quixotic-prism-473023-n8-terraform-state"
+    bucket = ""
     prefix = "wp"
   }
 }
@@ -37,23 +37,52 @@ data "google_project" "current" {
 }
 
 # Map profile to infrastructure resources
-# Tuned for 75K visits/month load testing
 locals {
   # Auto-construct WordPress URL based on Cloud Run naming convention
   wordpress_url = "https://${var.name_prefix}-wordpress-${data.google_project.current.number}.${var.region}.run.app"
 
   profile_config = {
     tiny = {
-      db_tier            = "db-f1-micro"
-      cpu_limit          = "1000m" # 1 CPU
-      memory_limit       = "512Mi" # 512MB RAM
-      min_instances      = 0
-      max_instances      = 3
-      enable_lb          = false
-      log_retention      = 90
-      estimated_cost_usd = "12-18"
+      db_tier             = "db-f1-micro"
+      cpu_limit           = "1000m" # 1 vCPU
+      memory_limit        = "512Mi" # 512MB RAM
+      min_instances       = 0
+      max_instances       = 3
+      enable_lb           = false
+      log_retention       = 90
+      request_concurrency = 10
     }
-    # other deployment profiles can be configured here
+    small = {
+      db_tier             = "db-f1-micro"
+      cpu_limit           = "2000m"
+      memory_limit        = "2Gi"
+      min_instances       = 0
+      max_instances       = 5
+      enable_lb           = false
+      log_retention       = 365
+      request_concurrency = 10
+    }
+    medium = {
+      db_tier             = "db-g1-small"
+      cpu_limit           = "4000m"
+      memory_limit        = "4Gi"
+      min_instances       = 0
+      max_instances       = 7
+      enable_lb           = false
+      log_retention       = 365
+      request_concurrency = 20
+    }
+    large = {
+      db_tier             = "db-n1-standard-1"
+      cpu_limit           = "4000m"
+      memory_limit        = "8Gi"
+      min_instances       = 1
+      max_instances       = 20
+      enable_lb           = false
+      log_retention       = 365
+      request_concurrency = 20
+    }
+
   }
 
   config = local.profile_config[var.deployment_profile]
@@ -104,8 +133,8 @@ module "wordpress_db_password" {
   password_length          = 10
   password_special_chars   = true
 
-  # For GDPR: replicate only in EU regions
-  replication_locations = ["europe-west1", "europe-west3"]
+  # Multi-region replication for high availability
+  replication_locations = ["us-central1", "us-east1"]
 
   labels = merge(var.labels, {
     purpose = "database-credentials"
@@ -123,8 +152,8 @@ module "wordpress_admin_password" {
   password_length          = 10
   password_special_chars   = true
 
-  # For GDPR: replicate only in EU regions
-  replication_locations = ["europe-west1", "europe-west3"]
+  # Multi-region replication for high availability
+  replication_locations = ["us-central1", "us-east1"]
 
   labels = merge(var.labels, {
     purpose = "admin-credentials"
@@ -133,7 +162,7 @@ module "wordpress_admin_password" {
   depends_on = [module.bootstrap]
 }
 
-module "mysql-db" {
+module "mysql_db" {
   source  = "terraform-google-modules/sql-db/google//modules/safer_mysql"
   version = "~> 26.0"
 
@@ -143,11 +172,21 @@ module "mysql-db" {
   project_id           = var.project_id
 
   deletion_protection = false
+  backup_configuration = {
+    enabled                        = true
+    transaction_log_retention_days = 7
+    retained_backups               = 7
+    binary_log_enabled             = false
+    location                       = null
+    retention_unit                 = null
+    start_time                     = null
+  }
 
-  database_version = "MYSQL_8_0"
-  region           = var.region
-  zone             = var.zones[0]
-  tier             = local.config.db_tier
+  database_version  = "MYSQL_8_0"
+  region            = var.region
+  zone              = var.zones[0]
+  tier              = local.config.db_tier
+  availability_type = null
 
   database_flags = [
     {
@@ -197,8 +236,8 @@ module "wordpress_sa_key_secret" {
   secret_data              = base64decode(google_service_account_key.wordpress_sa_key.private_key)
   generate_random_password = false
 
-  # For GDPR: replicate only in EU regions
-  replication_locations = ["europe-west1", "europe-west3"]
+  # Multi-region replication for high availability
+  replication_locations = ["us-central1", "us-east1"]
 
   labels = merge(var.labels, {
     purpose = "service-account-key"
@@ -211,10 +250,11 @@ module "wordpress_sa_key_secret" {
 module "media_storage" {
   source = "./modules/storage"
 
-  project_id  = var.project_id
-  bucket_name = "${var.project_id}-media"
-  name_prefix = ""
-  location    = var.region
+  project_id    = var.project_id
+  bucket_name   = "${var.project_id}-media"
+  name_prefix   = ""
+  force_destroy = true
+  location      = var.region
 
   # Allow public access for media files
   public_access_prevention = "inherited"
@@ -269,6 +309,7 @@ module "wordpress_cloudrun" {
   vpc_subnetwork_name = module.network.subnets_names[0]
   min_instances       = local.config.min_instances
   max_instances       = local.config.max_instances
+  request_concurrency = local.config.request_concurrency
 
   # Multi-container configuration
   containers = [
@@ -307,27 +348,7 @@ module "wordpress_cloudrun" {
         }
       }
 
-      # startup_probe = {
-      #   initial_delay_seconds = 10
-      #   timeout_seconds       = 3
-      #   period_seconds        = 10
-      #   failure_threshold     = 3
-      #   http_get = {
-      #     path = "/"
-      #     port = 80
-      #   }
-      # }
 
-      # liveness_probe = {
-      #   initial_delay_seconds = 30
-      #   timeout_seconds       = 3
-      #   period_seconds        = 30
-      #   failure_threshold     = 3
-      #   http_get = {
-      #     path = "/"
-      #     port = 80
-      #   }
-      # }
     },
     {
       name                 = "cloud-sql-proxy"
@@ -349,6 +370,10 @@ module "wordpress_cloudrun" {
     service = "wordpress"
   })
 
+  # IMPORTANT: Cloud Run Direct VPC egress creates serverless IP reservations
+  # that must be destroyed before the network. The depends_on ensures proper
+  # destruction order. The network module has a null_resource guard that will
+  # check for orphaned IPs during destroy.
   depends_on = [module.mysql_db, module.network]
 }
 

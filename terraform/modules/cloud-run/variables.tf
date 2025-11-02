@@ -63,6 +63,12 @@ variable "vpc_subnetwork_name" {
   default     = ""
 }
 
+variable "request_concurrency" {
+  type        = number
+  description = " maximum number of requests that each serving instance can receive. If not specified or 0, defaults to 80"
+  default     = 10
+}
+
 # Container Configuration
 variable "containers" {
   description = "List of containers to run in the service"
