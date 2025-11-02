@@ -213,6 +213,9 @@
             <div class="cost-row">
                 <span class="cost-label">
                     <span style="margin-right: 8px;">☁️</span>Cloud Run
+                    <span id="cloudrun-free-badge"
+                        style="display: none; margin-left: 8px; font-size: 11px; background: #dcfce7; color: #065f46; padding: 2px 8px; border-radius: 12px; font-weight: 600;">FREE
+                        TIER</span>
                 </span>
                 <span class="cost-value" id="cloudrun-cost">$0</span>
             </div>
@@ -266,6 +269,18 @@
                 <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 16px; font-weight: 600;"
                     id="annual-savings">
                     Annual savings: $538
+                </div>
+
+                <!-- GCP Free Credits Banner -->
+                <div
+                    style="background: #fef3c7; border: 2px dashed #f59e0b; padding: 12px; border-radius: 8px; margin-top: 12px; text-align: center;">
+                    <div style="font-size: 14px; color: #92400e; font-weight: 600; margin-bottom: 4px;">🎁 New GCP
+                        Accounts</div>
+                    <div style="font-size: 13px; color: #78350f; line-height: 1.5;">
+                        Get <strong>$300 free credits</strong> for 90 days<br>
+                        <span style="font-size: 12px; opacity: 0.9;" id="free-months-text">≈ First 3 months
+                            FREE</span>
+                    </div>
                 </div>
             </div>
 
@@ -464,6 +479,15 @@
                 `${tier.tier.toUpperCase()} Tier: ${tier.cpu_limit} vCPU • ${tier.memory_limit}GB RAM • Up to ${tier.max_instances} instances`;
 
             document.getElementById('cloudrun-cost').textContent = `$${cloudRunCost.toFixed(2)}`;
+
+            // Show free tier badge if Cloud Run is free
+            const cloudRunFreeBadge = document.getElementById('cloudrun-free-badge');
+            if (cloudRunCost < 0.01) {
+                cloudRunFreeBadge.style.display = 'inline';
+            } else {
+                cloudRunFreeBadge.style.display = 'none';
+            }
+
             document.getElementById('sql-cost').textContent = `$${sqlCost.toFixed(2)}`;
             document.getElementById('storage-cost').textContent = `$${storageCost.toFixed(2)}`;
             document.getElementById('egress-cost').textContent = `$${egressCost.toFixed(2)}`;
@@ -475,13 +499,20 @@
 
             if (savings > 0) {
                 savingsCard.style.borderColor = '#10b981';
-                document.getElementById('savings-header').innerHTML = `Savings vs WP Engine <b>${wpEnginePlanName}</b> plan`;
+                document.getElementById('savings-header').textContent = `Savings vs WP Engine ${wpEnginePlanName}`;
                 document.getElementById('monthly-savings').innerHTML = `$${Math.abs(savings).toFixed(0)}<span style="font-size: 18px; color: #6b7280;">/month</span>`;
                 document.getElementById('savings-percent').textContent = `${savingsPercent}% less`;
                 document.getElementById('savings-percent').style.background = '#dcfce7';
                 document.getElementById('savings-percent').style.color = '#065f46';
                 document.getElementById('annual-savings').innerHTML = `Annual savings: $${Math.abs(annualSavings).toFixed(0)}`;
                 document.getElementById('annual-savings').style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+                // Calculate free months with $300 credit
+                const freeMonthsWithCredit = Math.floor(300 / totalCost);
+                const freeMonthsText = freeMonthsWithCredit >= 3
+                    ? `≈ First 3 months FREE`
+                    : `≈ First ${freeMonthsWithCredit} months FREE`;
+                document.getElementById('free-months-text').textContent = freeMonthsText;
             } else {
                 savingsCard.style.borderColor = '#ef4444';
                 document.getElementById('savings-header').textContent = `Comparison to WP Engine ${wpEnginePlanName}`;
@@ -492,6 +523,13 @@
                 document.getElementById('savings-percent').style.color = '#991b1b';
                 document.getElementById('annual-savings').innerHTML = `Higher annual cost: $${Math.abs(annualSavings).toFixed(0)}`;
                 document.getElementById('annual-savings').style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+
+                // Calculate free months with $300 credit (even if more expensive)
+                const freeMonthsWithCredit = Math.floor(300 / totalCost);
+                const freeMonthsText = freeMonthsWithCredit >= 12
+                    ? `≈ First year+ FREE`
+                    : `≈ First ${freeMonthsWithCredit} months FREE`;
+                document.getElementById('free-months-text').textContent = freeMonthsText;
             }
 
             // Update note
