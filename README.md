@@ -26,11 +26,34 @@ Deploy a scalable, secure WordPress site on Google Cloud Platform in minutes. No
 | **Multi-region** | ✅ 40+ regions | ❌ Limited | ❌ Limited |
 | **Multi-sites** |  ❌ | ✅  3 sites  | ❌ |
 | **24/7 WordPress technical expertise** |  ❌ |  ✅   | ✅ |
+| **Managed WordPress Update** |  ❌ not yet |  ✅   | ✅ |
 
+## 💰 Cost Calculator
 
-**The Bottom Line:** Save 28-39% on costs. Pay only for traffic you serve, not idle capacity.
+**Want to know YOUR exact costs?**
 
----
+<div align="center">
+  <a href="https://tohidsmart.github.io/serverless-wordpress-gcp/calculator.html">
+    <img src="https://img.shields.io/badge/💰_Cost_Calculator-Try_Now-667eea?style=for-the-badge" alt="Cost Calculator">
+  </a>
+</div>
+
+Calculate your estimated monthly costs based on your traffic and see instant savings compared to WP Engine.
+
+**Features:**
+- 📊 Real-time cost estimates based on GCP pricing
+- 🎚️ Adjustable traffic patterns & performance profiles
+- 💵 Instant savings comparison vs WP Engine
+- 🎁 Shows free months with $300 GCP credits
+- 📈 Includes network egress & free tier calculations
+
+**Example results:**
+- **50K visitors/month:** ~$14/month (Cloud Run FREE!)
+- **75K visitors/month:** ~$15/month (Cloud Run FREE!)  
+- **180K visitors/month:** ~$71/month vs $290 WP Engine Scale plan
+
+*Cloud Run free tier covers up to 75K monthly visitors*
+
 
 ## 🎬 Deployment Demo
 
@@ -48,7 +71,7 @@ See the complete deployment process from a single command to a live WordPress si
 - WordPress container build and deployment
 - Live site in under 20 minutes
 
----
+
 
 ## 🎁 ^Free for 3 Months!
 
@@ -106,7 +129,7 @@ This means your WordPress hosting is **completely free** for the first 3 months,
 | **TOTAL** | | **$21.25/month** |
 
 **What you get for $21/month:**
-- 100,000 requests/month (Cloud Run free tier)
+- 25,000 visits/month (50,000 requests - Cloud Run free tier)
 - Automatic scaling from 0 to 3 instances
 - Automated daily backups with 7-day retention
 - 10GB media storage
@@ -117,8 +140,6 @@ This means your WordPress hosting is **completely free** for the first 3 months,
 - Pay only for actual compute time (request-based billing)
 - No charge when site has zero traffic
 - Additional requests: $0.40 per million
-
----
 
 ### Small Profile (Growing Sites)
 *Based on actual Google Cloud pricing as of October 2025 in _us-central1_ region*
@@ -194,7 +215,6 @@ Deployment takes ~8-12 minutes. For detailed information, please refer to [Deplo
 - **VPC + Cloud NAT**: Private networking with controlled egress
 - **Secret Manager**: Encrypted storage for database and admin passwords
 
----
 
 ## What's Included
 
@@ -207,7 +227,6 @@ Deployment takes ~8-12 minutes. For detailed information, please refer to [Deplo
 - ✅ Basic deployment guide
 
 ### Premium Version
-- 🔒 Multiple deployment profiles (small, medium, enterprise)
 - 🔒 FinOps add-ons (budgets, spending alerts, forecasting, custom billing dashboard)
 - 🔒 Enhanced compliance (audit logs, GDPR tools if required)
 - 🔒 Content delivery Network integration
