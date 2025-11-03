@@ -67,7 +67,7 @@ locals {
       cpu_limit           = "4000m"
       memory_limit        = "4Gi"
       min_instances       = 0
-      max_instances       = 7
+      max_instances       = 10
       enable_lb           = false
       log_retention       = 365
       request_concurrency = 20
@@ -224,7 +224,9 @@ module "mysql_db" {
 
 # Service Account Key for WP-Stateless
 resource "google_service_account_key" "wordpress_sa_key" {
-  service_account_id = module.wordpress_cloudrun.service_account_email
+  service_account_id = google_service_account.wordpress_sa.name
+
+  depends_on = [google_service_account.wordpress_sa]
 }
 
 # Store service account key in Secret Manager
@@ -297,19 +299,29 @@ module "media_storage" {
   depends_on = [module.bootstrap]
 }
 
+# Standalone Service Account for WordPress Cloud Run
+# Created here (not in cloud-run module) to avoid circular dependency with service account key
+resource "google_service_account" "wordpress_sa" {
+  project      = var.project_id
+  account_id   = "${var.name_prefix}-wordpress-sa"
+  display_name = "Service Account for ${var.name_prefix}-wordpress"
+  description  = "Service account for WordPress Cloud Run service"
+}
+
 # Cloud Run Service with WordPress and Cloud SQL Proxy sidecar
 module "wordpress_cloudrun" {
   source = "./modules/cloud-run"
 
-  project_id          = var.project_id
-  region              = var.region
-  name_prefix         = var.name_prefix
-  service_name        = "wordpress"
-  vpc_network_name    = module.network.network_id
-  vpc_subnetwork_name = module.network.subnets_names[0]
-  min_instances       = local.config.min_instances
-  max_instances       = local.config.max_instances
-  request_concurrency = local.config.request_concurrency
+  project_id            = var.project_id
+  region                = var.region
+  name_prefix           = var.name_prefix
+  service_name          = "wordpress"
+  service_account_email = google_service_account.wordpress_sa.email
+  vpc_network_name      = module.network.network_id
+  vpc_subnetwork_name   = module.network.subnets_names[0]
+  min_instances         = local.config.min_instances
+  max_instances         = local.config.max_instances
+  request_concurrency   = local.config.request_concurrency
 
   # Multi-container configuration
   containers = [

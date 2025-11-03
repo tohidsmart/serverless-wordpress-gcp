@@ -173,6 +173,13 @@ variable "traffic" {
   }]
 }
 
+# Service Account Configuration
+variable "service_account_email" {
+  description = "Optional external service account email to use. If not provided, a new service account will be created."
+  type        = string
+  default     = null
+}
+
 # IAM Configuration for Invokers
 variable "invoker_members" {
   description = "Members who can invoke the Cloud Run service (e.g., 'allUsers', 'user:email@example.com')"

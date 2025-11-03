@@ -40,17 +40,17 @@ output "service_location" {
 
 output "service_account_email" {
   description = "The email of the service account used by Cloud Run (use this for resource-level IAM bindings)"
-  value       = google_service_account.cloud_run.email
+  value       = local.service_account_email
 }
 
 output "service_account_id" {
-  description = "The ID of the service account"
-  value       = google_service_account.cloud_run.id
+  description = "The ID of the service account (only available if created by this module)"
+  value       = var.service_account_email == null ? google_service_account.cloud_run[0].id : null
 }
 
 output "service_account_name" {
-  description = "The name of the service account"
-  value       = google_service_account.cloud_run.name
+  description = "The name of the service account (only available if created by this module)"
+  value       = var.service_account_email == null ? google_service_account.cloud_run[0].name : null
 }
 
 

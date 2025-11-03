@@ -31,10 +31,15 @@
 
 locals {
   service_name = "${var.name_prefix}-${var.service_name}"
+
+  # Use provided service account or the one created by this module
+  service_account_email = var.service_account_email != null ? var.service_account_email : google_service_account.cloud_run[0].email
 }
 
-# Service Account for Cloud Run
+# Service Account for Cloud Run (conditional creation)
 resource "google_service_account" "cloud_run" {
+  count = var.service_account_email == null ? 1 : 0
+
   project      = var.project_id
   account_id   = "${local.service_name}-sa"
   display_name = "Service Account for ${local.service_name}"
@@ -53,7 +58,7 @@ resource "google_cloud_run_v2_service" "service" {
 
 
   template {
-    service_account                  = google_service_account.cloud_run.email
+    service_account                  = local.service_account_email
     max_instance_request_concurrency = var.request_concurrency
     vpc_access {
       egress = var.vpc_egress_mode
@@ -177,9 +182,6 @@ resource "google_cloud_run_v2_service" "service" {
     }
   }
 
-  depends_on = [
-    google_service_account.cloud_run
-  ]
 }
 
 # IAM policy for Cloud Run service (who can invoke)
