@@ -23,7 +23,7 @@
         }
 
         .subtitle {
-            color: #718096;
+            color: #4a5568;
             margin-bottom: 30px;
         }
 
@@ -40,7 +40,7 @@
 
         .help-text {
             font-size: 13px;
-            color: #718096;
+            color: #4a5568;
             margin-top: 4px;
             font-weight: 400;
         }
@@ -151,8 +151,8 @@
         }
 
         .github-link a {
-            color: #667eea;
-            text-decoration: none;
+            color: #5568d3;
+            text-decoration: underline;
             font-weight: 600;
         }
     </style>
@@ -247,13 +247,13 @@
                 </span>
                 <span class="cost-value">$0.95</span>
             </div>
-            <div class="cost-row total" style="border-top: 2px solid #667eea; margin-top: 12px; padding-top: 16px;">
+            <div class="cost-row total" style="border-top: 2px solid #5568d3; margin-top: 12px; padding-top: 16px;">
                 <span class="cost-label" style="font-size: 18px;">Your Monthly Cost</span>
-                <span class="cost-value" style="font-size: 24px; color: #667eea;" id="total-cost">$0</span>
+                <span class="cost-value" style="font-size: 24px; color: #5568d3;" id="total-cost">$0</span>
             </div>
 
             <div id="savings"
-                style="background: white; border: 3px solid #10b981; border-radius: 12px; padding: 20px; margin-top: 16px;">
+                style="background: white; border: 3px solid #059669; border-radius: 12px; padding: 20px; margin-top: 16px;">
                 <!-- Header -->
                 <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
                     <span style="font-size: 20px; margin-right: 8px;">💰</span>
@@ -263,14 +263,14 @@
 
                 <!-- Main savings -->
                 <div style="text-align: center; margin-bottom: 16px;">
-                    <div style="font-size: 36px; font-weight: 700; color: #10b981; margin-bottom: 4px;"
-                        id="monthly-savings">$45<span style="font-size: 18px; color: #6b7280;">/month</span></div>
-                    <div style="display: inline-block; background: #dcfce7; color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 14px; font-weight: 600;"
+                    <div style="font-size: 36px; font-weight: 700; color: #059669; margin-bottom: 4px;"
+                        id="monthly-savings">$45<span style="font-size: 18px; color: #4a5568;">/month</span></div>
+                    <div style="display: inline-block; background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 14px; font-weight: 600;"
                         id="savings-percent">76% less</div>
                 </div>
 
                 <!-- Annual savings -->
-                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 16px; font-weight: 600;"
+                <div style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 16px; font-weight: 600;"
                     id="annual-savings">
                     Annual savings: $538
                 </div>
@@ -301,9 +301,9 @@
                     <li>Comparison: WP Engine Monthly Essential plans</li>
                     <li>Accuracy: Best-effort estimation, actual costs may vary</li>
                     <li>Verification: Use <a href="https://cloud.google.com/products/calculator" target="_blank"
-                            style="color: #667eea; text-decoration: none;">GCP's official calculator</a></li>
+                            style="color: #5568d3; text-decoration: underline;">GCP's official calculator</a></li>
                     <li>Built with the help of <a href="https://claude.ai" target="_blank"
-                            style="color: #667eea; text-decoration: none;">Claude.ai</a></li>
+                            style="color: #5568d3; text-decoration: underline;">Claude.ai</a></li>
                 </ul>
             </div>
 
@@ -502,14 +502,15 @@
             const wpEnginePlanName = wpEnginePlan ? wpEnginePlan.name.charAt(0).toUpperCase() + wpEnginePlan.name.slice(1) : 'Professional';
 
             if (savings > 0) {
-                savingsCard.style.borderColor = '#10b981';
+                savingsCard.style.borderColor = '#059669';
                 document.getElementById('savings-header').innerHTML = `Savings vs WP Engine <b>${wpEnginePlanName}</b> plan`;
-                document.getElementById('monthly-savings').innerHTML = `$${Math.abs(savings).toFixed(0)}<span style="font-size: 18px; color: #6b7280;">/month</span>`;
+                document.getElementById('monthly-savings').innerHTML = `$${Math.abs(savings).toFixed(0)}<span style="font-size: 18px; color: #4a5568;">/month</span>`;
+                document.getElementById('monthly-savings').style.color = '#059669';
                 document.getElementById('savings-percent').textContent = `${savingsPercent}% less`;
-                document.getElementById('savings-percent').style.background = '#dcfce7';
+                document.getElementById('savings-percent').style.background = '#d1fae5';
                 document.getElementById('savings-percent').style.color = '#065f46';
                 document.getElementById('annual-savings').innerHTML = `Annual savings: $${Math.abs(annualSavings).toFixed(0)}`;
-                document.getElementById('annual-savings').style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                document.getElementById('annual-savings').style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
 
                 // Calculate free months with $300 credit
                 const freeMonthsWithCredit = Math.floor(300 / totalCost);
@@ -518,15 +519,15 @@
                     : `≈ First ${freeMonthsWithCredit} months FREE`;
                 document.getElementById('free-months-text').textContent = freeMonthsText;
             } else {
-                savingsCard.style.borderColor = '#ef4444';
+                savingsCard.style.borderColor = '#dc2626';
                 document.getElementById('savings-header').textContent = `Comparison to WP Engine ${wpEnginePlanName}`;
-                document.getElementById('monthly-savings').innerHTML = `$${Math.abs(savings).toFixed(0)}<span style="font-size: 18px; color: #6b7280;">/month</span>`;
-                document.getElementById('monthly-savings').style.color = '#ef4444';
+                document.getElementById('monthly-savings').innerHTML = `$${Math.abs(savings).toFixed(0)}<span style="font-size: 18px; color: #4a5568;">/month</span>`;
+                document.getElementById('monthly-savings').style.color = '#dc2626';
                 document.getElementById('savings-percent').textContent = `${Math.abs(savingsPercent)}% more`;
                 document.getElementById('savings-percent').style.background = '#fee2e2';
                 document.getElementById('savings-percent').style.color = '#991b1b';
                 document.getElementById('annual-savings').innerHTML = `Higher annual cost: $${Math.abs(annualSavings).toFixed(0)}`;
-                document.getElementById('annual-savings').style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                document.getElementById('annual-savings').style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
 
                 // Calculate free months with $300 credit (even if more expensive)
                 const freeMonthsWithCredit = Math.floor(300 / totalCost);

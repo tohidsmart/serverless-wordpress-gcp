@@ -53,13 +53,13 @@ strong {
 }
 
 a {
-    color: #667eea;
-    text-decoration: none;
+    color: #5568d3;
+    text-decoration: underline;
     transition: color 0.3s;
 }
 
 a:hover {
-    color: #764ba2;
+    color: #5941a9;
     text-decoration: underline;
 }
 
