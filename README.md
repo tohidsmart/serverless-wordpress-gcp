@@ -33,7 +33,7 @@ Deploy a scalable, secure WordPress site on Google Cloud Platform in minutes. No
 **Want to know YOUR exact costs?**
 
 <div align="center">
-  <a href="https://tohidsmart.github.io/serverless-wordpress-gcp/calculator.html">
+  <a href="https://tohidsmart.github.io/serverless-wordpress-gcp/cost-calculator.html">
     <img src="https://img.shields.io/badge/💰_Cost_Calculator-Try_Now-667eea?style=for-the-badge" alt="Cost Calculator">
   </a>
 </div>
