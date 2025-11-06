@@ -28,6 +28,14 @@ plugins:
    - jekyll-seo-tag
    - jekyll-sitemap
 
+# Override theme styles
+minima:
+  skin: classic
+
+# Add custom CSS
+header_pages:
+  - index.md
+
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
 # to override the default setting.
