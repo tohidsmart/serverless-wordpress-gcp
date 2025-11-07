@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Calculate your WordPress hosting costs on Google Cloud Run. Compare savings vs WP Engine, Kinsta, and managed hosting. Interactive cost breakdown with free tier estimates.">
+    <meta name="keywords"
+        content="wordpress gcp cost, cloud run pricing, wpengine alternative cost, wordpress hosting calculator">
+
+    <title>WordPress GCP Cost Calculator | Compare vs WP Engine & Kinsta</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* Calculator-specific styles */
+        .container {
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #4a5568;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .help-text {
+            font-size: 13px;
+            color: #4a5568;
+            margin-top: 4px;
+            font-weight: 400;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.35);
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+            padding: 24px;
+            background: #f7fafc;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .tier-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .cost-row:last-child {
+            border-bottom: none;
+        }
+
+        .cost-row.total {
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            padding: 16px 12px !important;
+            margin: 12px -12px 0 -12px;
+            border-radius: 8px;
+            border-bottom: none !important;
+        }
+
+        .cost-label {
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .cost-value {
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .note {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #92400e;
+            margin-top: 16px;
+        }
+
+        .github-link {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .github-link a {
+            color: #5568d3;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+    </style>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "WordPress GCP Cost Calculator",
+  "description": "Calculate WordPress hosting costs on Google Cloud Platform",
+  "url": "https://yourusername.github.io/serverless-wordpress-gcp/calculator.html",
+  "applicationCategory": "UtilityApplication",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+</head>
+
+<body>
+    <div class="container">
+        <p style="margin-bottom: 20px;"><a href="index.html">← Back to Home</a></p>
+        <h1>💰 WordPress on GCP Cost Calculator</h1>
+        <p class="subtitle">Calculate your estimated monthly costs and savings</p>
+
+        <div class="input-group">
+            <label for="visitors">Monthly Visitors</label>
+            <input type="number" id="visitors" placeholder="e.g., 50000" value="50000">
+        </div>
+
+        <div class="input-group">
+            <label for="storage">Storage Needed (GB)</label>
+            <input type="number" id="storage" placeholder="e.g., 10" value="10">
+            <div class="help-text">For media files (photos, videos)</div>
+        </div>
+
+        <div class="input-group">
+            <label for="traffic">Traffic Pattern</label>
+            <select id="traffic">
+                <option value="steady">Steady (consistent throughout day)</option>
+                <option value="moderate" selected>Moderate (peaks during business hours)</option>
+                <option value="spiky">Spiky (occasional traffic surges)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="concurrency">Performance Profile</label>
+            <select id="concurrency">
+                <option value="5">Conservative (5 concurrent requests/instance)</option>
+                <option value="10" selected>Standard (10 concurrent requests/instance)</option>
+                <option value="20">Optimized (20 concurrent requests/instance)</option>
+            </select>
+            <div class="help-text">Higher concurrency = lower costs, but requires optimization</div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculate()">Calculate My Costs →</button>
+
+        <div class="results" id="results">
+            <div class="tier-badge" id="tier-badge"></div>
+
+            <div class="cost-row">
+                <span class="cost-label">
+                    <span style="margin-right: 8px;">☁️</span>Cloud Run
+                    <span id="cloudrun-free-badge"
+                        style="display: none; margin-left: 8px; font-size: 11px; background: #dcfce7; color: #065f46; padding: 2px 8px; border-radius: 12px; font-weight: 600;">FREE
+                        TIER</span>
+                </span>
+                <span class="cost-value" id="cloudrun-cost">$0</span>
+            </div>
+            <div class="cost-row">
+                <span class="cost-label">
+                    <span style="margin-right: 8px;">🗄️</span>Cloud SQL
+                </span>
+                <span class="cost-value" id="sql-cost">$0</span>
+            </div>
+            <div class="cost-row">
+                <span class="cost-label">
+                    <span style="margin-right: 8px;">📦</span>Cloud Storage
+                </span>
+                <span class="cost-value" id="storage-cost">$0</span>
+            </div>
+            <div class="cost-row">
+                <span class="cost-label">
+                    <span style="margin-right: 8px;">🌐</span>Network Egress
+                </span>
+                <span class="cost-value" id="egress-cost">$0</span>
+            </div>
+            <div class="cost-row">
+                <span class="cost-label">
+                    <span style="margin-right: 8px;">⚙️</span>Other Services
+                </span>
+                <span class="cost-value">$0.95</span>
+            </div>
+            <div class="cost-row total" style="border-top: 2px solid #5568d3; margin-top: 12px; padding-top: 16px;">
+                <span class="cost-label" style="font-size: 18px;">Your Monthly Cost</span>
+                <span class="cost-value" style="font-size: 24px; color: #5568d3;" id="total-cost">$0</span>
+            </div>
+
+            <div id="savings"
+                style="background: white; border: 3px solid #059669; border-radius: 12px; padding: 20px; margin-top: 16px;">
+                <!-- Header -->
+                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                    <span style="font-size: 20px; margin-right: 8px;">💰</span>
+                    <span style="font-size: 16px; color: #4b5563; font-weight: 600;" id="savings-header">Savings vs WP
+                        Engine Professional</span>
+                </div>
+
+                <!-- Main savings -->
+                <div style="text-align: center; margin-bottom: 16px;">
+                    <div style="font-size: 36px; font-weight: 700; color: #059669; margin-bottom: 4px;"
+                        id="monthly-savings">$45<span style="font-size: 18px; color: #4a5568;">/month</span></div>
+                    <div style="display: inline-block; background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 14px; font-weight: 600;"
+                        id="savings-percent">76% less</div>
+                </div>
+
+                <!-- Annual savings -->
+                <div style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 16px; font-weight: 600;"
+                    id="annual-savings">
+                    Annual savings: $538
+                </div>
+
+                <!-- GCP Free Credits Banner -->
+                <div
+                    style="background: #fef3c7; border: 2px dashed #f59e0b; padding: 12px; border-radius: 8px; margin-top: 12px; text-align: center;">
+                    <div style="font-size: 14px; color: #92400e; font-weight: 600; margin-bottom: 4px;">🎁 New GCP
+                        Accounts</div>
+                    <div style="font-size: 13px; color: #78350f; line-height: 1.5;">
+                        Get <strong>$300 free credits</strong> for 90 days<br>
+                        <span style="font-size: 12px; opacity: 0.9;" id="free-months-text">≈ First 3 months
+                            FREE</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="note" id="note">
+                💡 Estimates based on us-central1 pricing. Actual costs may vary based on optimization and traffic
+                patterns.
+            </div>
+
+            <div
+                style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-top: 12px; font-size: 12px; color: #64748b; line-height: 1.6;">
+                <div style="font-weight: 600; color: #475569; margin-bottom: 8px;">📋 Estimation Details</div>
+                <ul style="margin: 0; padding-left: 18px;">
+                    <li>Pricing: GCP us-central1 (November 2025)</li>
+                    <li>Comparison: WP Engine Monthly Essential plans</li>
+                    <li>Accuracy: Best-effort estimation, actual costs may vary</li>
+                    <li>Verification: Use <a href="https://cloud.google.com/products/calculator" target="_blank"
+                            style="color: #5568d3; text-decoration: underline;">GCP's official calculator</a></li>
+                    <li>Built with the help of <a href="https://claude.ai" target="_blank"
+                            style="color: #5568d3; text-decoration: underline;">Claude.ai</a></li>
+                </ul>
+            </div>
+
+            <div class="github-link">
+                <a href="https://github.com/tohidsmart/serverless-wordpress-gcp" target="_blank">
+                    ⭐ View on GitHub →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const wp_engine_plans = [
+            {
+                name: 'startup',
+                visits: 25000,
+                storage: 10,
+                price: 30
+            },
+            {
+                name: 'professional',
+                visits: 75000,
+                storage: 15,
+                price: 59
+            },
+            {
+                name: 'growth',
+                visits: 100000,
+                storage: 20,
+                price: 115
+            },
+            {
+                name: 'scale',
+                visits: 400000,
+                storage: 50,
+                price: 290
+            }
+        ]
+
+        const wp_gcp_tiers = [
+            {
+                tier: 'tiny',
+                visits: 25000,
+                db_tier: "db-f1-micro",
+                cpu_limit: 1,
+                memory_limit: 0.5,
+                min_instances: 0,
+                max_instances: 3,
+                wp_engine_plan: 'startup'
+            },
+            {
+                tier: 'small',
+                visits: 75000,
+                db_tier: "db-f1-micro",
+                cpu_limit: 2,
+                memory_limit: 2,
+                min_instances: 0,
+                max_instances: 5,
+                wp_engine_plan: 'professional'
+            },
+            {
+                tier: 'medium',
+                visits: 100000,
+                db_tier: "db-g1-small",
+                cpu_limit: 4,
+                memory_limit: 4,
+                min_instances: 0,
+                max_instances: 10,
+                wp_engine_plan: 'growth'
+            },
+            {
+                tier: 'large',
+                visits: 400000,
+                db_tier: "db-n1-standard-1",
+                cpu_limit: 4,
+                memory_limit: 8,
+                min_instances: 1,
+                max_instances: 20,
+                wp_engine_plan: 'scale'
+            }
+        ]
+
+        // SQL pricing lookup table
+        const sqlPricing = {
+            "db-f1-micro": 10.17,
+            "db-g1-small": 25.55,
+            "db-n1-standard-1": 51.75
+        }
+
+        function calculateCloudRunCost(tier, traffic, visitors, concurrency) {
+            const numberOfRequests = visitors * 2; // 2 requests per visit (avg)
+            const requestDurationSeconds = 3; // Average request duration
+
+            // Apply concurrency factor - multiple requests can share one instance
+            const effectiveRequests = numberOfRequests / concurrency;
+
+            // GCP Cloud Run pricing (Request-based billing)
+            const cpuPricingPerSecond = 0.000024;
+            const freeCPUSeconds = 180000; // 180K vCPU-seconds free per month
+
+            const ramPricingPerSecond = 0.0000025;
+            const freeRAMSeconds = 360000; // 360K GiB-seconds free per month
+
+            const requestFixedPricingPerMillion = 0.4;
+            const freeRequestsPerMonth = 2000000; // 2M requests free per month
+
+            // Calculate costs (ensuring no negative values from free tier)
+            const cpuCost = Math.max(0,
+                ((tier.cpu_limit * effectiveRequests * requestDurationSeconds) - freeCPUSeconds) * cpuPricingPerSecond
+            );
+
+            const ramCost = Math.max(0,
+                ((tier.memory_limit * effectiveRequests * requestDurationSeconds) - freeRAMSeconds) * ramPricingPerSecond
+            );
+
+            const requestsCost = Math.max(0,
+                ((numberOfRequests - freeRequestsPerMonth) / 1000000) * requestFixedPricingPerMillion
+            );
+
+            // Sum up Cloud Run costs
+            let cloudRunCost = cpuCost + ramCost + requestsCost;
+
+            // Adjust for traffic pattern (affects instance count/time)
+            if (traffic === 'spiky') {
+                cloudRunCost *= 1.2; // +20% for overhead
+            } else if (traffic === 'steady') {
+                cloudRunCost *= 0.9; // -10% optimization
+            }
+
+            return cloudRunCost;
+        }
+
+        function calculate() {
+            const visitors = parseInt(document.getElementById('visitors').value) || 0;
+            const storage = parseInt(document.getElementById('storage').value) || 10;
+            const traffic = document.getElementById('traffic').value;
+            const concurrency = parseInt(document.getElementById('concurrency').value) || 10;
+
+            // Find appropriate tier based on visitor count
+            const tier = wp_gcp_tiers
+                .sort((a, b) => a.visits - b.visits) // Sort ascending
+                .find(t => visitors <= t.visits) || wp_gcp_tiers[wp_gcp_tiers.length - 1]
+
+            // Get SQL cost from pricing table
+            const sqlCost = sqlPricing[tier.db_tier] || 10.17;
+
+            // Calculate Cloud Run cost
+            const cloudRunCost = calculateCloudRunCost(tier, traffic, visitors, concurrency);
+
+            // Storage cost ($0.026 per GB per month for Standard Storage)
+            const storageCost = storage * 0.026;
+
+            // Network egress cost (rough estimate: 0.5 MB per page view)
+            const pageSizeMB = 0.5;
+            const totalDataTransferGB = (visitors * pageSizeMB) / 1024;
+            const freeEgressGB = 1; // 1 GB free per month (North America)
+            const egressCost = Math.max(0, (totalDataTransferGB - freeEgressGB) * 0.12);
+
+            // Other fixed costs (Artifact Registry, Secret Manager, etc.)
+            const otherCosts = 0.95;
+
+            // Total cost
+            const totalCost = cloudRunCost + sqlCost + storageCost + egressCost + otherCosts;
+
+            // Savings calculation vs WP Engine
+            const wpEnginePlan = wp_engine_plans.find(plan => plan.name === tier.wp_engine_plan);
+            const wpEngineCost = wpEnginePlan ? wpEnginePlan.price : 59;
+            const savings = wpEngineCost - totalCost;
+            const savingsPercent = Math.round((savings / wpEngineCost) * 100);
+            const annualSavings = savings * 12;
+
+            // Determine if free tier covers everything
+            const isFreeTier = totalCost < 1.50; // Essentially just fixed costs
+
+            // Update UI
+            document.getElementById('tier-badge').textContent =
+                `${tier.tier.toUpperCase()} Tier: ${tier.cpu_limit} vCPU • ${tier.memory_limit}GB RAM • Up to ${tier.max_instances} instances`;
+
+            document.getElementById('cloudrun-cost').textContent = `$${cloudRunCost.toFixed(2)}`;
+
+            // Show free tier badge if Cloud Run is free
+            const cloudRunFreeBadge = document.getElementById('cloudrun-free-badge');
+            if (cloudRunCost < 0.01) {
+                cloudRunFreeBadge.style.display = 'inline';
+            } else {
+                cloudRunFreeBadge.style.display = 'none';
+            }
+
+            document.getElementById('sql-cost').textContent = `$${sqlCost.toFixed(2)}`;
+            document.getElementById('storage-cost').textContent = `$${storageCost.toFixed(2)}`;
+            document.getElementById('egress-cost').textContent = `$${egressCost.toFixed(2)}`;
+            document.getElementById('total-cost').textContent = `$${totalCost.toFixed(2)}`;
+
+            // Update savings display
+            const savingsCard = document.getElementById('savings');
+            const wpEnginePlanName = wpEnginePlan ? wpEnginePlan.name.charAt(0).toUpperCase() + wpEnginePlan.name.slice(1) : 'Professional';
+
+            if (savings > 0) {
+                savingsCard.style.borderColor = '#059669';
+                document.getElementById('savings-header').innerHTML = `Savings vs WP Engine <b>${wpEnginePlanName}</b> plan`;
+                document.getElementById('monthly-savings').innerHTML = `$${Math.abs(savings).toFixed(0)}<span style="font-size: 18px; color: #4a5568;">/month</span>`;
+                document.getElementById('monthly-savings').style.color = '#059669';
+                document.getElementById('savings-percent').textContent = `${savingsPercent}% less`;
+                document.getElementById('savings-percent').style.background = '#d1fae5';
+                document.getElementById('savings-percent').style.color = '#065f46';
+                document.getElementById('annual-savings').innerHTML = `Annual savings: $${Math.abs(annualSavings).toFixed(0)}`;
+                document.getElementById('annual-savings').style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+
+                // Calculate free months with $300 credit
+                const freeMonthsWithCredit = Math.floor(300 / totalCost);
+                const freeMonthsText = freeMonthsWithCredit >= 3
+                    ? `≈ First 3 months FREE`
+                    : `≈ First ${freeMonthsWithCredit} months FREE`;
+                document.getElementById('free-months-text').textContent = freeMonthsText;
+            } else {
+                savingsCard.style.borderColor = '#dc2626';
+                document.getElementById('savings-header').textContent = `Comparison to WP Engine ${wpEnginePlanName}`;
+                document.getElementById('monthly-savings').innerHTML = `$${Math.abs(savings).toFixed(0)}<span style="font-size: 18px; color: #4a5568;">/month</span>`;
+                document.getElementById('monthly-savings').style.color = '#dc2626';
+                document.getElementById('savings-percent').textContent = `${Math.abs(savingsPercent)}% more`;
+                document.getElementById('savings-percent').style.background = '#fee2e2';
+                document.getElementById('savings-percent').style.color = '#991b1b';
+                document.getElementById('annual-savings').innerHTML = `Higher annual cost: $${Math.abs(annualSavings).toFixed(0)}`;
+                document.getElementById('annual-savings').style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+
+                // Calculate free months with $300 credit (even if more expensive)
+                const freeMonthsWithCredit = Math.floor(300 / totalCost);
+                const freeMonthsText = freeMonthsWithCredit >= 12
+                    ? `≈ First year+ FREE`
+                    : `≈ First ${freeMonthsWithCredit} months FREE`;
+                document.getElementById('free-months-text').textContent = freeMonthsText;
+            }
+
+            // Update note
+            const noteElement = document.getElementById('note');
+            if (isFreeTier) {
+                noteElement.innerHTML = `
+                    🎉 Your usage falls within GCP's free tier! You'll only pay for Cloud SQL and fixed costs (~$11-12/month).
+                `;
+                noteElement.style.background = '#d1fae5';
+                noteElement.style.borderColor = '#10b981';
+                noteElement.style.color = '#065f46';
+            } else {
+                noteElement.innerHTML = `
+                    💡 Estimate based on ${concurrency} concurrent requests per instance. 
+                    Actual costs may be lower with optimization (caching, CDN, image optimization).
+                `;
+                noteElement.style.background = '#fef3c7';
+                noteElement.style.borderColor = '#f59e0b';
+                noteElement.style.color = '#92400e';
+            }
+
+            // Show results
+            document.getElementById('results').classList.add('show');
+        }
+
+        // Calculate on load with default values
+        window.onload = function () {
+            calculate();
+        };
+    </script>
+</body>
+
+</html>

@@ -9,24 +9,46 @@ Deploy a scalable, secure WordPress site on Google Cloud Platform in minutes. No
 
 ## Why This vs Managed WordPress?
 
-| Feature | **This Solution** | WP Engine | Kinsta |
-|---------|-------------------|-----------|--------|
-| **Monthly Cost** as of Oct 2025 | **$36** | $59 | $50 |
+**Cost: $36/month vs $59+ for WP Engine/Kinsta (not for personal bloggers - use WordPress.com)**
+
+| Feature | **This Solution** | WP Engine | WordPress.com |
+|---------|-------------------|-----------|---------------|
+| **Best For** | Agencies/Developers | Enterprises | Personal Blogs |
+| **Monthly Cost** as of Oct 2025 | **$36** | $59 | $4-25 |
 | **Free hosting period** | **3 months^** | ❌ | ❌ |
-| **Traffic Included** | 75K visits (150K requests) | 75K visits | 65K visits |
+| **Traffic Included** | 75K visits (150K requests) | 75K visits | Varies |
 | **Auto-scaling** | ✅ 0-5 instances (pay per request) | ❌ Fixed resources | ❌ Fixed resources |
 | **Infrastructure Control** | ✅ Full access | ❌ Black box | ❌ Black box |
 | **Infrastructure as Code** | ✅ Terraform | ❌ | ❌ |
 | **Vendor Lock-in** | ✅ None - you own it | ❌ Locked | ❌ Locked |
 | **Custom Architecture** | ✅ Fully customizable | ❌ Limited | ❌ Limited |
 | **Database Backups** | ✅ Auto + PITR | ✅ | ✅ |
-| **Backups Retention** | 7 days | ? | 14 days |
+| **Backups Retention** | 7 days | ? | 30 days |
 | **CDN for Media** | ✅ Google Cloud Storage | ✅ | ✅ |
 | **One-Click Deploy** | ✅ | ✅ | ✅ |
 | **Multi-region** | ✅ 40+ regions | ❌ Limited | ❌ Limited |
 | **Multi-sites** |  ❌ | ✅  3 sites  | ❌ |
 | **24/7 WordPress technical expertise** |  ❌ |  ✅   | ✅ |
 | **Managed WordPress Update** |  ❌ not yet |  ✅   | ✅ |
+
+## Not Sure Which Solution?
+
+**Use WordPress.com ($4-25/month) if:**
+- Personal blog or simple site
+- No custom functionality needed
+- Want zero technical involvement
+
+**Use this solution ($36/month) if:**
+- WordPress agency managing client sites
+- Need full infrastructure control
+- Want Infrastructure as Code (Terraform)
+- Require custom database access
+- Require data sovereignty, governance and compliance 
+
+**Use WP Engine ($59+/month) if:**
+- Need 24/7 WordPress support
+- Want managed updates/security
+- Budget isn't a concern
 
 ## 💰 Cost Calculator
 

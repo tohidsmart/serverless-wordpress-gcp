@@ -10,9 +10,6 @@ Deploy production-ready WordPress on Google Cloud Platform for **$36/month**.
 
 **60% cheaper than WP Engine** ($59/month) with full infrastructure control.
 
-## Quick Links
-- [💰 Cost Calculator](cost-calculator.html) - See your exact savings
-- [⭐ View on GitHub](https://github.com/tohidsmart/serverless-wordpress-gcp)
 
 ## Who This Is For
 - **Freelance developers** building client WordPress sites
@@ -32,15 +29,3 @@ Deploy production-ready WordPress on Google Cloud Platform for **$36/month**.
 - ✅ Full GCP infrastructure control
 - ✅ Free tier covers up to 75K visitors/month
 
-<!-- ## Real Cost Comparison
-[Your existing table]
-
-## How It Works
-[Brief architecture overview - 2-3 sentences + link to architecture page]
-
-## Get Started
-[Big button to deployment guide] -->
-
----
-
-**⭐ Star on GitHub if this helped you!**
